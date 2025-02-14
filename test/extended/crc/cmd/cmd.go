@@ -98,10 +98,22 @@ func (c Command) env() []string {
 }
 
 func envVariable(key, value string) string {
+	var prefix = "";
+	var suffix = "";
 	if runtime.GOOS == "windows" {
-		return fmt.Sprintf("$env:%s=%s;", key, value)
+		prefix = "$env:"
+		suffix = ";"
+		switch value {
+		case "true":
+			value = "$true"
+			break
+		case "false":
+			value = "$false"
+			break
+		default:
+		}
 	}
-	return fmt.Sprintf("%s=%s", key, value)
+	return fmt.Sprintf("%s%s=%s%s", prefix, key, value, suffix)
 }
 
 func (c Command) validate() error {
