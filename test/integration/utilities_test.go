@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 	"time"
 
@@ -21,11 +22,30 @@ type CRCBuilder struct {
 // NewCRCCommand returns a CRCBuilder for running CRC.
 func NewCRCCommand(args ...string) *CRCBuilder {
 	cmd := exec.Command("crc", args...)
-	cmd.Env = append(os.Environ(), "CRC_DISABLE_UPDATE_CHECK=true")
-	cmd.Env = append(os.Environ(), "CRC_LOG_LEVEL=debug")
+	cmd.Env = append(os.Environ(), envVariable("CRC_DISABLE_UPDATE_CHECK", "true"))
+	cmd.Env = append(cmd.Env, envVariable("CRC_LOG_LEVEL", "debug"))
 	return &CRCBuilder{
 		cmd: cmd,
 	}
+}
+
+func envVariable(key, value string) string {
+	var prefix = "";
+	var suffix = "";
+	if runtime.GOOS == "windows" {
+		prefix = "$env:"
+		suffix = ";"
+		switch value {
+		case "true":
+			value = "$true"
+			break
+		case "false":
+			value = "$false"
+			break
+		default:
+		}
+	}
+	return fmt.Sprintf("%s%s=%s%s", prefix, key, value, suffix)
 }
 
 // WithTimeout sets the given timeout and returns itself.
