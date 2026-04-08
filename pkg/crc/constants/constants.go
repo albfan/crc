@@ -147,10 +147,16 @@ func GetDefaultBundleSignedHashURL(preset crcpreset.Preset) string {
 }
 
 func ResolveHelperPath(executableName string) string {
+	var resolvedPath string
+
 	if version.IsInstaller() {
-		return filepath.Join(version.InstallPath(), executableName)
+		resolvedPath = filepath.Join(version.InstallPath(), executableName)
+	} else {
+		resolvedPath = filepath.Join(CrcBinDir, executableName)
 	}
-	return filepath.Join(CrcBinDir, executableName)
+
+	fmt.Println(resolvedPath)
+	return resolvedPath
 }
 
 func AdminHelperPath() string {
