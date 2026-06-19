@@ -12,7 +12,9 @@ Feature: Application Deployment Test
 
     @testdata @linux @windows @darwin @cleanup @needs_namespace
     Scenario: Deploy a java application using Eclipse JKube in pod and then verify it's health
-        When executing "oc new-project testproj" succeeds
+        When executing "oc create namespace testproj" succeeds
+        And executing "oc config set-context --current --namespace=testproj" succeeds
+        And executing "oc new-project testproj" succeeds
         And executing "oc create -f jkube-kubernetes-build-resources.yaml" succeeds
         And executing "oc start-build jkube-application-deploy-buildconfig --follow" succeeds
         And executing "oc rollout status -w dc/jkube-application-deploy-test --timeout=600s" succeeds
